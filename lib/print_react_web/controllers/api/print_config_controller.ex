@@ -25,10 +25,7 @@ defmodule PrintReactWeb.Api.PrintConfigController do
       Task.async(fn ->
         Request.execute(
           :get_printer_attributes,
-          %Printer{
-            url: "http://localhost:631/printers/#{printer_name}",
-            uri: "ipp://localhost:631/printers/#{printer_name}"
-          }
+          Printer.new(printer_name)
         )
       end)
     end)

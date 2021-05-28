@@ -1,0 +1,15 @@
+# CUPS
+
+## How to talk to CUPS?
+
+The HTTP and IPP protocols are used to communicate between the application and the CUPS server. A minimal IPP client has been implemented and can be used by doing the following:
+
+```elixir
+alias IPP.{Printer, Request}
+
+printer = Printer.new("HP_OfficeJet_Pro_8710")
+
+Request.execute(:get_printer_attributes, printer)
+```
+
+First, you create an `%IPP.Printer{}` struct with the name of the printer. Then you call `IPP.Request.execute/2` passing an operation and the printer.

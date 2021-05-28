@@ -11,7 +11,8 @@ defmodule IPP.Request do
     send_request(url, data)
   end
 
-  def execute(op = :print_job, %Printer{uri: uri, url: url}, file_path) do
+  def execute(op = :print_job, %Printer{uri: uri, url: url}, file_path)
+      when is_bitstring(file_path) do
     data = Serializer.serialize(op, uri, file_path)
 
     send_request(url, data)

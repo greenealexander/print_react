@@ -24,7 +24,7 @@ defmodule PUP.Models.JobRowModel do
         name: "p1",
         form_type: "YearEnd",
         printers:
-          Enum.map(1..(:random.uniform(6) + 6), fn i ->
+          Enum.map(1..(:rand.uniform(6) + 6), fn i ->
             "#{opts.start_code}-printer#{i}"
           end)
       })

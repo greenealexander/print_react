@@ -3,10 +3,25 @@ defmodule IPP.Parser.Utils do
   alias Enums.Tags
 
   def parse_value(tag_id, group, binary) do
-    <<value_length::size(16), binary::binary>> = binary
+    <<value_length::16, binary::binary>> = binary
     tag = Tags.lookup(tag_id)
 
     case tag do
+      keyword
+      when keyword in [
+             "nameWithoutLanguage",
+             "textWithoutLanguage",
+             "octetString",
+             "memberAttrName",
+             "keyword",
+             "uri",
+             "uriScheme",
+             "charset",
+             "naturalLanguage",
+             "mimeMediaType"
+           ] ->
+        parse_string(binary, value_length)
+
       "enum" ->
         parse_enum(binary, group)
 
@@ -28,36 +43,6 @@ defmodule IPP.Parser.Utils do
       "nameWithLanguage" ->
         parse_with_language(binary)
 
-      "nameWithoutLanguage" ->
-        parse_string(binary, value_length)
-
-      "textWithoutLanguage" ->
-        parse_string(binary, value_length)
-
-      "octetString" ->
-        parse_string(binary, value_length)
-
-      "memberAttrName" ->
-        parse_string(binary, value_length)
-
-      "keyword" ->
-        parse_string(binary, value_length)
-
-      "uri" ->
-        parse_string(binary, value_length)
-
-      "uriScheme" ->
-        parse_string(binary, value_length)
-
-      "charset" ->
-        parse_string(binary, value_length)
-
-      "naturalLanguage" ->
-        parse_string(binary, value_length)
-
-      "mimeMediaType" ->
-        parse_string(binary, value_length)
-
       "dateTime" ->
         parse_datetime(binary)
 
@@ -71,7 +56,7 @@ defmodule IPP.Parser.Utils do
   end
 
   def parse_name(binary) do
-    <<name_length::size(16), binary::binary>> = binary
+    <<name_length::16, binary::binary>> = binary
     parse_string(binary, name_length)
   end
 
@@ -94,20 +79,20 @@ defmodule IPP.Parser.Utils do
     if next_tag == 0x03 do
       false
     else
-      <<_, name::size(16), _::binary>> = binary
+      <<_, name::16, _::binary>> = binary
 
       next_tag !== 0x4A and next_tag !== 0x37 and next_tag !== 0x03 and name == 0x0000
     end
   end
 
   defp parse_enum(binary, group) do
-    <<key::size(32), binary::binary>> = binary
+    <<key::32, binary::binary>> = binary
     enum = Enums.get_enum(key, group)
     {enum, binary}
   end
 
   defp parse_integer(binary) do
-    <<value::size(32), binary::binary>> = binary
+    <<value::32, binary::binary>> = binary
     {value, binary}
   end
 
@@ -118,12 +103,12 @@ defmodule IPP.Parser.Utils do
   end
 
   defp parse_range_of_integer(binary) do
-    <<min::size(32), max::size(32), binary::binary>> = binary
+    <<min::32, max::32, binary::binary>> = binary
     {[min, max], binary}
   end
 
   defp parse_resolution(binary) do
-    <<w::size(32), h::size(32), tag, binary::binary>> = binary
+    <<w::32, h::32, tag, binary::binary>> = binary
 
     label = if tag == 0x03, do: "dpi", else: "dpcm"
 
@@ -131,7 +116,7 @@ defmodule IPP.Parser.Utils do
   end
 
   defp parse_datetime(binary) do
-    <<_::size(16), _, _, _, _, _, _, _, _, _, binary::binary>> = binary
+    <<_::16, _, _, _, _, _, _, _, _, _, binary::binary>> = binary
     {"datetime", binary}
   end
 
@@ -150,18 +135,18 @@ defmodule IPP.Parser.Utils do
 
   defp parse_unknown(binary, length) do
     if length == 0,
-      do: {"", binary},
+      do: {"unknown", binary},
       else: parse_string(binary, length)
   end
 
   defp parse_collection(binary, collection \\ %{}) do
-    <<tag, _::size(16), rest::binary>> = binary
+    <<tag, _::16, rest::binary>> = binary
 
     if tag !== 0x4A or tag == 0x37 do
       {collection, binary}
     else
       {member_name, rest} = parse_value(tag, nil, rest)
-      <<member_tag, _::size(16), rest::binary>> = rest
+      <<member_tag, _::16, rest::binary>> = rest
       value = parse_value(member_tag, nil, rest)
       updated_collection = Map.put(collection, member_name, value)
       {updated_collection, binary}

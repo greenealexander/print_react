@@ -3,7 +3,7 @@ defmodule IPP.Parser do
   alias IPP.Parser.Utils
 
   def parse(binary) do
-    <<version::size(16), status::size(16), request_id::size(32), binary::binary>> = binary
+    <<version::16, status::16, request_id::32, binary::binary>> = binary
 
     base = %{
       version: Versions.get(version),
@@ -43,7 +43,7 @@ defmodule IPP.Parser do
       else
         {tag, rest} =
           if tag == 0x7F do
-            <<extension_tag::size(32), rest::binary>> = rest
+            <<extension_tag::32, rest::binary>> = rest
             {extension_tag, rest}
           else
             {tag, rest}
@@ -73,7 +73,7 @@ defmodule IPP.Parser do
           else: {[value, initial_value], binary}
       end
     else
-      <<next_tag, _::size(16), binary::binary>> = binary
+      <<next_tag, _::16, binary::binary>> = binary
 
       if is_nil(initial_value) do
         parse_values(next_tag, binary, group, value)
