@@ -3,6 +3,7 @@
 ## App Demo
 
 ![print react demo gif](./print_react_demo.gif)
+![print react dependency graph](./xref_graph.png)
 
 To start your Phoenix server:
 
