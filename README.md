@@ -1,5 +1,9 @@
 # PrintReact
 
+## App Demo
+
+![print react demo gif](./print_react_demo.gif)
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
@@ -17,3 +21,8 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+****
+
+## Livebook Demo
+
+![livebook demo gif](./livebook_demo.gif)
